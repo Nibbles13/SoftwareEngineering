@@ -1,0 +1,12 @@
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\bin\Debug\ACME_Interface.exe.config
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\bin\Debug\ACME_Interface.exe
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\bin\Debug\ACME_Interface.pdb
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\bin\Debug\WebDriver.dll
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\bin\Debug\WebDriver.xml
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\obj\Debug\ACME_Interface.csprojAssemblyReference.cache
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\obj\Debug\ACME_Interface.Properties.Resources.resources
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\obj\Debug\ACME_Interface.csproj.GenerateResource.cache
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\obj\Debug\ACME_Interface.csproj.CoreCompileInputs.cache
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\obj\Debug\ACME_Interface.csproj.CopyComplete
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\obj\Debug\ACME_Interface.exe
+C:\Users\Milo\source\repos\ACME_Interface\ACME_Interface\obj\Debug\ACME_Interface.pdb
