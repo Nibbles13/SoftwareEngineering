@@ -17,11 +17,36 @@ namespace ConsoleApp1
         {
             Console.WriteLine("Choose from OMdb_API (O) or The_Movie_DB_API (M) [M in progress]");
             char c = Console.ReadKey().KeyChar;
-            c = char.ToUpper(c); 
-            if (c == 'O')
+			string OApiKey = "&apikey=d6b3c2ae";
+			string OAddress = "http://www.omdbapi.com/";
+			c = char.ToUpper(c);
+
+			string[] dbInfo = new string[3]; // string[] , 0 = db choice, 1 = apiKey, 2 = address;
+			dbInfo[0] = c.ToString();
+			if (c== 'O')
+			{
+				dbInfo[1] = OApiKey;
+				dbInfo[2] = OAddress;
+			}
+
+			OMovie movieInfo = new OMovie();
+
+			movieInfo = SearchRead(dbInfo);
+
+
+			Console.WriteLine("   Title: {0} ", movieInfo.title.ToString());
+			Console.WriteLine("    Year: {0} ", movieInfo.year.ToString());
+			Console.WriteLine("  Rating: {0} ", movieInfo.rated.ToString());
+			Console.WriteLine("Released: {0} ", movieInfo.released.ToString());
+			Console.WriteLine(" Runtime: {0} ", movieInfo.runtime.ToString());
+			Console.WriteLine("   Genre: {0} ", movieInfo.genre.ToString());
+			Console.WriteLine("Director: {0} ", movieInfo.director.ToString());
+			Console.WriteLine("  Poster: {0} ", movieInfo.poster.ToString());
+
+			if (c == 'O')
             {
-                OMovie movieInfo = new OMovie();
-                movieInfo = RandomInput();
+                
+                movieInfo = RandomInput(OApiKey);
                 
                 // display movie info (from OMDbapi)
                 if (movieInfo.title != null)
@@ -48,7 +73,7 @@ namespace ConsoleApp1
 
         }
 
-        static OMovie RandomInput()
+        static OMovie RandomInput(string apiKey) // ----- change string to string[]
         {
             OMovie movieInfo = new OMovie();
             InvalidOId contentsIn = new InvalidOId();
@@ -59,7 +84,7 @@ namespace ConsoleApp1
             do
             {
                 string id = RandomGenerate();
-                string apiKey = "&apikey=d6b3c2ae";
+                
                 using (var client = new WebClient())
                 {
                     string address = "http://www.omdbapi.com/?i=" + id + apiKey;
@@ -74,7 +99,41 @@ namespace ConsoleApp1
             return movieInfo;
         }
 
-        static string RandomGenerate()
+
+
+		static string SearchGenerate(string[] dbInfo) //string[] , 0 = db choice, 1 = apiKey, 2 = address;
+		{
+			string address = "";
+			Console.Write("Enter Search Item (one word): ");
+			string searchItem = Console.ReadLine();
+			address = dbInfo[2] + "?t=" + searchItem + dbInfo[1];
+			Console.WriteLine(address);
+			return address;
+		} // http://www.omdbapi.com/?t=shrek&apikey=d6b3c2ae
+
+		static OMovie SearchRead(string[] dbInfo)
+		{
+			OMovie movieInfo = new OMovie();
+			InvalidOId contentsIn = new InvalidOId();
+			string contents;
+			using (var client = new WebClient())
+			{
+				contents = client.DownloadString(SearchGenerate(dbInfo));    // contents was originally of type var not string, declared here      // http://www.omdbapi.com/  ?i=tt389619   8&apikey=d6b3c2ae
+				if (contents.Contains("False"))
+					contentsIn = JsonConvert.DeserializeObject<InvalidOId>(contents);   // if the json string includes the word error then deserialise into contents(invalid)
+				else
+					movieInfo = JsonConvert.DeserializeObject<OMovie>(contents);
+
+			}
+
+			return movieInfo;
+		}
+
+
+
+
+
+		static string RandomGenerate()
         // generate a random number that will be used as the imdb ID number
         // This does not really work because the chances of it generating an Id for a film rather than tv show, episode or actor is unlikely and so does not return correct results.
         {
