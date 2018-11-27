@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,14 +15,47 @@ namespace ConsoleApp1
 	{
         static void Main(string[] args)  // program for testing and finding out how to create some of the functionallity of JSON from the webfile to the Progrm
         {
-            Movie movieInfo = new Movie();
-            invalidId wrongAns = new invalidId // create object to represent what is output if the imdb id is wrong.
+            Console.WriteLine("Choose from OMdb_API (O) or The_Movie_DB_API (M) [M in progress]");
+            char c = Console.ReadKey().KeyChar;
+            c = char.ToUpper(c); 
+            if (c == 'O')
             {
-                Response = "False",
-                Error = "Incorrect IMDb ID."
-            };
+                OMovie movieInfo = new OMovie();
+                movieInfo = RandomInput();
+                
+                // display movie info (from OMDbapi)
+                if (movieInfo.title != null)
+                {
+                    Console.WriteLine("   Title: {0} ", movieInfo.title.ToString());
+                    Console.WriteLine("    Year: {0} ", movieInfo.year.ToString());
+                    Console.WriteLine("  Rating: {0} ", movieInfo.rated.ToString());
+                    Console.WriteLine("Released: {0} ", movieInfo.released.ToString());
+                    Console.WriteLine(" Runtime: {0} ", movieInfo.runtime.ToString());
+                    Console.WriteLine("   Genre: {0} ", movieInfo.genre.ToString());
+                    Console.WriteLine("Director: {0} ", movieInfo.director.ToString());
+                    Console.WriteLine("  Poster: {0} ", movieInfo.poster.ToString());
+                }
+                else // error message
+                {
+                    Console.WriteLine("This movie ID does not exsits -- random generator must try again"); // this line shouldn't be needed anymore having updated the while loop
+                }
+            }else if (c == 'M')
+            {
+
+            }
+
+            Console.ReadLine(); // just to hold the console.
+
+        }
+
+        static OMovie RandomInput()
+        {
+            OMovie movieInfo = new OMovie();
+            InvalidOId contentsIn = new InvalidOId();
             string contents;
-            invalidId contentsIn = new invalidId();
+
+
+            // -- push the contents from random generation into the object
             do
             {
                 string id = RandomGenerate();
@@ -33,24 +66,12 @@ namespace ConsoleApp1
                     //Console.WriteLine(address);
                     contents = client.DownloadString(address);    // contents was originally of type var not string, declared here      // http://www.omdbapi.com/  ?i=tt389619   8&apikey=d6b3c2ae
                     if (contents.Contains("False"))
-                        contentsIn = JsonConvert.DeserializeObject<invalidId>(contents);   // if the json string includes the word error then deserialise into contents(invalid)
+                        contentsIn = JsonConvert.DeserializeObject<InvalidOId>(contents);   // if the json string includes the word error then deserialise into contents(invalid)
                     else
-                        movieInfo = JsonConvert.DeserializeObject<Movie>(contents);
+                        movieInfo = JsonConvert.DeserializeObject<OMovie>(contents);
                 }
-            } while (contentsIn == wrongAns);
-            Console.WriteLine(movieInfo); // this is no how to output the whole object unfortunately
-            Console.WriteLine("   mnTitle: {0} ",movieInfo.title.ToString()); 
-            Console.WriteLine("    Year: {0} ",movieInfo.year.ToString()); 
-            Console.WriteLine("  Rating: {0} ",movieInfo.rated.ToString()); 
-            Console.WriteLine("Released: {0} ",movieInfo.released.ToString()); 
-            Console.WriteLine(" Runtime: {0} ",movieInfo.runtime.ToString()); 
-            Console.WriteLine("   Genre: {0} ",movieInfo.genre.ToString()); 
-            Console.WriteLine("Director: {0} ",movieInfo.director.ToString()); 
-            Console.WriteLine("  Poster: {0} ",movieInfo.poster.ToString()); 
-
-
-            Console.ReadLine();
-
+            } while (movieInfo.title == null);
+            return movieInfo;
         }
 
         static string RandomGenerate()
@@ -71,23 +92,24 @@ namespace ConsoleApp1
             return imdbId;
         }
 
-        public void LoadJson()
+        public void LoadShrekJson()
 		{
 			using (StreamReader r = new StreamReader("shrek.json"))  // I think this section needs some json extension to work as there is no .net library built in.
 			{
 				string json = r.ReadToEnd();
-				List<Movie> movie = JsonConvert.DeserializeObject<List<Movie>>(json); 
+				List<OMovie> movie = JsonConvert.DeserializeObject<List<OMovie>>(json); 
 			}
 
 		}
 
-        public class invalidId
+        // classes classification for OMDb_API results
+        public class InvalidOId
         {
             public string Response;
             public string Error;
         }
 
-		public class Movie
+		public class OMovie
 		{
 			public string title;
 			public string year;
@@ -99,6 +121,12 @@ namespace ConsoleApp1
             public string poster;
             
 		}
+
+        // Classes classification for TMDb API
+        public class TMovie
+        {
+            //    https://api.themoviedb.org/3/               movie/76341 ?api_key=7e929b51f75e77af894a92da22cfd032
+        }
 
 
     }
