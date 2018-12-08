@@ -27,6 +27,9 @@ namespace ConsoleApp1
             dbInfo[1] = OApiKey;
             dbInfo[2] = OAddress;
 
+            SearchList();
+
+
             ReadWishlist(ref wList);    // reads wishlist file saving the contents in a string array which will then be converted into a OMovie object to display the information for
             ShowWishList(wList);
 
@@ -247,44 +250,79 @@ namespace ConsoleApp1
 
         // search region
         #region
-        static OMovie SearchList()                     // disply the results of a search of a movie UPDATE -> change the type to string[] so that can just take out the "IMDBID" = "____"; for ech search result
+
+        static OMovie SearchList()// searches on a word which brings a list of results which the user chooses one of amd returns the information on that film in object.
         {
-            OMovie chosenMovie = new OMovie();
-            OMovie[] MovieList = new OMovie[10];
-            string contents = "", searchItem, apiKey = "&apikey=d6b3c2ae";
-            string[] contentsAr = new string[10];
-
-
-            int count = 0;
-            bool results = false;
-
-
-            Console.Write("Search field: ");
-            searchItem = Console.ReadLine();
-            // bool to see where the results start
+            OMovie[] movieInfo = new OMovie[10];
+            SearchResults sList = new SearchResults();
+            Console.Write("Enter Search Item: ");
+            string searchVal = Console.ReadLine();
+            string sAddress  = "http://www.omdbapi.com/?s=";
+            string apiKey = "&apikey=d6b3c2ae";
+            string contents;
             using (var client = new WebClient())    // pulls the json from the web
             {
-                string address = "http://www.omdbapi.com/?s=" + searchItem + apiKey;
-                Console.WriteLine(address);
+                string address = sAddress+ searchVal + apiKey;
+                //Console.WriteLine(address);
                 contents = client.DownloadString(address);
             }
-            JObject o = JObject.Parse(contents);
-            IList<JToken> resultsObj = o["Title"]["Year"].Children().ToList();
-
-            // serialize JSON results into .NET objec ts
-            IList<OMovie> searchResults = new List<OMovie>();
-            foreach (JToken result in resultsObj)
+            string contents2 = ""; // new string making json an array
+            // Console.WriteLine(contents);
+            bool arrayBound = false;
+            string[] jsonStr = new string[10];
+            int count = -1;
+            char last= ' ';
+            if (contents.Contains("True")) // moves data from string into string[]
             {
-                // JToken.ToObject is a helper method that uses JsonSerializer internally
-                OMovie searchResult = result.ToObject<OMovie>();
-                searchResults.Add(searchResult);
+                foreach(char c in contents)
+                {
+                    if ((c == ',') & (last == '}'))
+                        continue;
+                    if (arrayBound)
+                    {
+                        if (c == ']')
+                            arrayBound = false;
+                        else
+                        {
+                            jsonStr[count] = jsonStr[count] + c;
+                            if (c == '}')
+                                count++;
+                        }
+                        
+                    }
+                    else
+                    {
+                        if (c == '[')
+                        {
+                            arrayBound = true;
+                            contents2 = contents2 + c;
+                            count++;
+                        }
+                        
+                    }
+
+                    last = c;
+                }
+            }
+            Console.WriteLine("Choose one of the following options (1-10)");
+
+            for (int i = 0; i < count; i++) 
+            {
+                movieInfo[i] = JsonConvert.DeserializeObject<OMovie>(jsonStr[i]);
+                Console.WriteLine("{0}. {1}, ({2})", i+1, movieInfo[i].title, movieInfo[i].year);
             }
 
-            Console.WriteLine(searchResults.ToString());
+            char choice = Console.ReadKey().KeyChar;
+            int choiceI = choice - '0';
+            choiceI--;
 
 
-            return chosenMovie;
+
+            Console.WriteLine(sList.ID[0]);
+            return movieInfo[choiceI];
         }
+        
+
 
         static OMovie SearchOnID(string ID)
         {
@@ -382,9 +420,6 @@ namespace ConsoleApp1
             public string[] IDs = new string[20];
 
         }
-
-
-
 
         #endregion
 
