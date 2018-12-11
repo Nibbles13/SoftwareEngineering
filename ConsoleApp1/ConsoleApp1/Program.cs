@@ -28,7 +28,7 @@ namespace ConsoleApp1
             dbInfo[2] = OAddress;
 
             SearchList();
-
+            AddToWishlist(ref wList, movieInfo.imdbId, movieInfo);
 
             ReadWishlist(ref wList);    // reads wishlist file saving the contents in a string array which will then be converted into a OMovie object to display the information for
             ShowWishList(wList);
@@ -37,16 +37,16 @@ namespace ConsoleApp1
 
             movieInfo = SearchRead(dbInfo);
             // "Add this film to the wishlist?"
-            AddToWishlist(ref wList,movieInfo.imdbId);
+            AddToWishlist(ref wList,movieInfo.imdbId, movieInfo);
 
 
             Console.WriteLine(wList.IDs[0]); // this works and als reference works so that the actial values are chnaged 
             //WriteWishList(wList);
 
-            Console.WriteLine("/n/n/nFile Written");
+            Console.WriteLine("\n\n\nFile Written");
             Console.ReadLine();
 
-            AddToWishlist(ref wList, "tt0537428");
+            AddToWishlist(ref wList, "tt0537428", movieInfo);
             int count = 0;
             foreach(string s in wList.IDs) // make sure AddToWishlist has worked
             {
@@ -93,7 +93,6 @@ namespace ConsoleApp1
                 }
                 count++;
             }
-
         }
            
         static void ReadWishlist(ref Wishlist wList) // read the wishlist file into a string to then be split up into an arrary of movie obejct
@@ -147,24 +146,29 @@ namespace ConsoleApp1
             */       
         }
 
-        static void AddToWishlist(ref Wishlist wList, string IdToAdd)
+        static void AddToWishlist(ref Wishlist wList, string IdToAdd, OMovie chosenMovie)
         {
-            int count = 0;
-            foreach(string s in wList.IDs) // find the next possible index to store a value
-            {
-                if (s != "")
-                    count++;
+            Console.Write("Would you like to add {0}, {1} to your wishlist? (Y/N)",chosenMovie.title,chosenMovie.year);
+            char choice = ' ';
+            choice = Console.ReadKey().KeyChar;
 
-            }
-            if (wList.IDs[wList.IDs.Length] == "")
-                wList.IDs[count] = IdToAdd;
-            else
+            if (choice == 'Y') // movie is chosen to be added to this wishlist
             {
-                Console.WriteLine("Wishlist is full, please remove an item before");
-                // -> "would you like to remove an tem from the wishlist? (Y/N)"
-                removeWishlistItem(ref wList);
+                int count = 0; // used to have this at -1
+                foreach (string s in wList.IDs) // find the next possible index to store a value
+                {
+                    if (s != "") // if string is not null then there must be a movie in that location so move to the next one
+                        count++;
+                }
+                if (count < wList.IDs.Length) //(wList.IDs[wList.IDs.Length] != "") // if the end location is 
+                    wList.IDs[count] = chosenMovie.imdbId;
+                else
+                {
+                    Console.WriteLine("Wishlist is full, please remove an item before adding a new movie");
+                    // -> "would you like to remove an item from the wishlist? (Y/N)"
+                    removeWishlistItem(ref wList);
+                }
             }
-
         }
 
         static void removeWishlistItem(ref Wishlist wList)
@@ -192,7 +196,7 @@ namespace ConsoleApp1
                 count++;
             }
 
-            System.IO.File.WriteAllText(@"C:\Users\tomwe\Documents\University\Software Engineering\Projects\MovieDbProjectConsoleApp\MovieDbProjectConsoleApp\WishList.txt", contents); //WriteAllText() rather than WriteAllLine() as this is for string array
+            System.IO.File.WriteAllText(fileDir, contents); //WriteAllText() rather than WriteAllLine() as this is for string array
             Console.WriteLine("Wishlist written to file");
             Console.ReadKey();
         }
@@ -254,7 +258,7 @@ namespace ConsoleApp1
         static OMovie SearchList()// searches on a word which brings a list of results which the user chooses one of amd returns the information on that film in object.
         {
             OMovie[] movieInfo = new OMovie[10];
-            SearchResults sList = new SearchResults();
+            string[] sList = new string[10];
             Console.Write("Enter Search Item: ");
             string searchVal = Console.ReadLine();
             string sAddress  = "http://www.omdbapi.com/?s=";
@@ -318,7 +322,7 @@ namespace ConsoleApp1
 
 
 
-            Console.WriteLine(sList.ID[0]);
+            Console.WriteLine(movieInfo[choiceI].title+" chosen");
             return movieInfo[choiceI];
         }
         
@@ -376,6 +380,9 @@ namespace ConsoleApp1
 
         #endregion
 
+        // test region
+        #region
+
         public void LoadShrekJson() // just originally to help to understand json & c# compatibility
         {
             using (StreamReader r = new StreamReader("shrek.json"))  // I think this section needs some json extension to work as there is no .net library built in.
@@ -385,6 +392,7 @@ namespace ConsoleApp1
             }
 
         }
+        #endregion
 
         // class region
         #region
